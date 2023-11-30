@@ -15,3 +15,8 @@ export async function getSchedulings(){
   console.log(response.data);
   return response.data;
 }
+
+export async function getScheduling(id: number){
+  const response = await api.get<Schedule>(`/agendamentos/${id}`);
+  return response.data;
+}
