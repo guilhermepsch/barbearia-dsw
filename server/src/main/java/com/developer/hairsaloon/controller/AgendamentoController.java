@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,15 @@ public class AgendamentoController {
 
   @PostMapping
   public ResponseEntity<AgendamentoEntity> createAgendamento(@RequestBody AgendamentoEntity agendamento) {
+    if (agendamento.getClienteNome() == null || agendamento.getClienteNome().isEmpty()) {
+      throw new RuntimeException("O Nome do cliente deve ser informado.");
+    }
+    if (agendamento.getEmailCliente() == null || agendamento.getEmailCliente().isEmpty()) {
+      throw new RuntimeException("O Email do cliente deve ser informado.");
+    }
+    if (agendamento.getDataHora() == null) {
+      throw new RuntimeException("A Data e Hora do agendamento deve ser informada.");
+    }
     if (agendamento.getServicoId() != null && agendamento.getFuncionarioId() != null) {
       ServicoEntity servico = servicoService.findServicoById(agendamento.getServicoId())
           .orElseThrow(() -> new RuntimeException("Servico not found"));
@@ -70,6 +80,18 @@ public class AgendamentoController {
 
   @PutMapping
   public AgendamentoEntity updateAgendamento(@RequestBody AgendamentoEntity agendamento) {
+    if (agendamento.getId() == null) {
+      throw new RuntimeException("Id do agendamento deve ser informado.");
+    }
+    if (agendamento.getClienteNome() == null || agendamento.getClienteNome().isEmpty()) {
+      throw new RuntimeException("O Nome do cliente deve ser informado.");
+    }
+    if (agendamento.getEmailCliente() == null || agendamento.getEmailCliente().isEmpty()) {
+      throw new RuntimeException("O Email do cliente deve ser informado.");
+    }
+    if (agendamento.getDataHora() == null) {
+      throw new RuntimeException("A Data e Hora do agendamento deve ser informada.");
+    }
     if (agendamento.getServicoId() != null && agendamento.getFuncionarioId() != null) {
       ServicoEntity servico = servicoService.findServicoById(agendamento.getServicoId())
           .orElseThrow(() -> new RuntimeException("Servico not found"));
@@ -88,5 +110,10 @@ public class AgendamentoController {
   @DeleteMapping("/{id}")
   public void deleteAgendamento(@PathVariable("id") Long id) {
     agendamentoService.deleteAgendamentoById(id);
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+    return ResponseEntity.badRequest().body(e.getMessage());
   }
 }

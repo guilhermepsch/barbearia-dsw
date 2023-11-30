@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +50,12 @@ public class RegistroServicoController {
 
   @PostMapping
   public RegistroServicoEntity saveRegistroServico(@RequestBody RegistroServicoEntity registroServico) {
+    if (registroServico.getClienteEmail() == null || registroServico.getClienteEmail().isEmpty()) {
+      throw new RuntimeException("O Email do cliente deve ser informado.");
+    }
+    if (registroServico.getDataHora() == null) {
+      throw new RuntimeException("A Data e Hora do agendamento deve ser informada.");
+    }
     if (registroServico.getServicoId() != null && registroServico.getFuncionarioId() != null) {
       ServicoEntity servico = servicoService.findServicoById(registroServico.getServicoId())
           .orElseThrow(() -> new RuntimeException("Servico not found"));
@@ -63,6 +71,15 @@ public class RegistroServicoController {
 
   @PutMapping
   public RegistroServicoEntity updateRegistroServico(@RequestBody RegistroServicoEntity registroServico) {
+    if (registroServico.getId() == null) {
+      throw new RuntimeException("O ID do registro de servico deve ser informado.");
+    }
+    if (registroServico.getClienteEmail() == null || registroServico.getClienteEmail().isEmpty()) {
+      throw new RuntimeException("O Email do cliente deve ser informado.");
+    }
+    if (registroServico.getDataHora() == null) {
+      throw new RuntimeException("A Data e Hora do agendamento deve ser informada.");
+    }
     if (registroServico.getServicoId() != null && registroServico.getFuncionarioId() != null) {
       ServicoEntity servico = servicoService.findServicoById(registroServico.getServicoId())
           .orElseThrow(() -> new RuntimeException("Servico not found"));
@@ -80,5 +97,10 @@ public class RegistroServicoController {
   @DeleteMapping("/{id}")
   public void deleteRegistroServico(@PathVariable("id") Long id) {
     registroServicoService.deleteRegistroServicosById(id);
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+    return ResponseEntity.badRequest().body(e.getMessage());
   }
 }

@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,16 +41,49 @@ public class ProdutoController {
 
   @PostMapping
   public ProdutoEntity saveProduto(@RequestBody ProdutoEntity produto) {
+    if (produto.getNome() == null || produto.getNome().isEmpty()) {
+      throw new RuntimeException("O Nome do produto deve ser informado.");
+    }
+    if (produto.getDescricao() == null || produto.getDescricao().isEmpty()) {
+      throw new RuntimeException("A Descricao do produto deve ser informada.");
+    }
+    if (produto.getPreco() == null) {
+      throw new RuntimeException("O Preco do produto deve ser informado.");
+    }
+    if (produto.getEstoque() == null) {
+      throw new RuntimeException("O Estoque do produto deve ser informado.");
+    }
     return produtoService.saveProduto(produto);
   }
 
   @PutMapping
   public ProdutoEntity updateProduto(@RequestBody ProdutoEntity produto) {
+    if (produto.getId() == null) {
+      throw new RuntimeException("O ID do produto deve ser informado.");
+    }
+    if (produto.getNome() == null || produto.getNome().isEmpty()) {
+      throw new RuntimeException("O Nome do produto deve ser informado.");
+    }
+    if (produto.getDescricao() == null || produto.getDescricao().isEmpty()) {
+      throw new RuntimeException("A Descricao do produto deve ser informada.");
+    }
+    if (produto.getPreco() == null) {
+      throw new RuntimeException("O Preco do produto deve ser informado.");
+    }
+    if (produto.getEstoque() == null) {
+      throw new RuntimeException("O Estoque do produto deve ser informado.");
+    }
     return produtoService.updateProduto(produto);
   }
 
   @DeleteMapping("/{id}")
   public void deleteProduto(@PathVariable("id") Long id) {
     produtoService.deleteProdutoById(id);
+  }
+
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+    return ResponseEntity.badRequest().body(e.getMessage());
   }
 }
