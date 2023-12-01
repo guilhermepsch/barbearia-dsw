@@ -34,13 +34,17 @@ public class AgendamentoServiceImpl implements AgendamentoService {
     if (agendamento.getDataHora().before(new Date())) {
       throw new RuntimeException("Não é possível agendar para uma data passada");
     }
+
     List<AgendamentoEntity> agendamentos = agendamentoRepository.findAll();
     for (AgendamentoEntity agendamentoEntity : agendamentos) {
-      if ((agendamentoEntity.getDataHora().getTime() == agendamento.getDataHora().getTime()) && (agendamentoEntity.getFuncionario().getId() == agendamento.getFuncionario().getId())) {
+      if (agendamentoEntity.getDataHora().equals(agendamento.getDataHora())
+          && agendamentoEntity.getFuncionario().getId().equals(agendamento.getFuncionario().getId())) {
         throw new RuntimeException("Não é possível agendar para o mesmo horário com o mesmo funcionário");
       }
-      if ((agendamentoEntity.getDataHora().getTime() == agendamento.getDataHora().getTime() + 3600000)
-          && (agendamentoEntity.getFuncionario().getId() == agendamento.getFuncionario().getId())) {
+
+      long timeDifference = Math.abs(agendamentoEntity.getDataHora().getTime() - agendamento.getDataHora().getTime());
+      if (timeDifference < 3600000
+          && agendamentoEntity.getFuncionario().getId().equals(agendamento.getFuncionario().getId())) {
         throw new RuntimeException("Já existe um agendamento dentro de uma hora com o mesmo funcionário");
       }
     }
@@ -52,16 +56,21 @@ public class AgendamentoServiceImpl implements AgendamentoService {
     if (agendamento.getDataHora().before(new Date())) {
       throw new RuntimeException("Não é possível agendar para uma data passada");
     }
+
     List<AgendamentoEntity> agendamentos = agendamentoRepository.findAll();
     for (AgendamentoEntity agendamentoEntity : agendamentos) {
-      if ((agendamentoEntity.getDataHora().getTime() == agendamento.getDataHora().getTime()) && (agendamentoEntity.getFuncionario().getId() == agendamento.getFuncionario().getId())) {
+      if (agendamentoEntity.getDataHora().equals(agendamento.getDataHora())
+          && agendamentoEntity.getFuncionario().getId().equals(agendamento.getFuncionario().getId())) {
         throw new RuntimeException("Não é possível agendar para o mesmo horário com o mesmo funcionário");
       }
-      if ((agendamentoEntity.getDataHora().getTime() == agendamento.getDataHora().getTime() + 3600000)
-          && (agendamentoEntity.getFuncionario().getId() == agendamento.getFuncionario().getId())) {
+
+      long timeDifference = Math.abs(agendamentoEntity.getDataHora().getTime() - agendamento.getDataHora().getTime());
+      if (timeDifference < 3600000
+          && agendamentoEntity.getFuncionario().getId().equals(agendamento.getFuncionario().getId())) {
         throw new RuntimeException("Já existe um agendamento dentro de uma hora com o mesmo funcionário");
       }
     }
+
     return agendamentoRepository.save(agendamento);
   }
 
